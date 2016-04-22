@@ -1,0 +1,52 @@
+const OBJECT = 'object'
+const ARRAY = 'array'
+const WRONG_TYPE = new Error('Target type must be and object or array, and received must be same as the target.')
+
+function typeOf (data) {
+  return Object.prototype.toString.call(data).slice(8, -1).toLowerCase()
+}
+
+function merger (target, received) {
+  const targetType = typeOf(target)
+  const receivedType = typeOf(received)
+
+  switch (receivedType) {
+    case OBJECT: {
+      if (targetType === OBJECT) {
+        for (const name in received) {
+          const { [name]: value } = received
+
+          target[name] = merger(target[name], value)
+        }
+      } else {
+        target = received
+      }
+
+      return target
+    }
+    case ARRAY: {
+      if (targetType === ARRAY) {
+        received.forEach((value, index) => {
+          target[index] = merger(target[index], value)
+        })
+      } else {
+        target = received
+      }
+
+      return target
+    }
+    default: {
+      return target = received
+    }
+  }
+}
+
+export default function superMerge (target, received) {
+  const targetType = typeOf(target)
+  const receivedType = typeOf(received)
+
+  if (!((targetType === OBJECT && receivedType === OBJECT)
+     || (targetType === ARRAY && receivedType === ARRAY))) throw WRONG_TYPE
+
+  return merger(target, received)
+}
